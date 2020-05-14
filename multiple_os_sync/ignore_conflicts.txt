@@ -1,2 +1,13 @@
-Frostpunk
-Cities Skylines
+# format: game, reason...
+# big games
+Arma 3, native on both
+# classics
+Banished, its small, works fine, steam cloud
+Cities Skylines, musthave
+Frostpunk, proton makes it slow, but playable
+Kerbal Space Program, unityEmess, better keep it on Windows as well
+RimWorld, its small, works fine, steam cloud
+# VR
+SoundStage, VR
+# fun
+

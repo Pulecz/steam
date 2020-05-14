@@ -13,14 +13,19 @@ def multiple_paths(paths):
             result.append(dir_name)
     return result
 
-def ignore_conflicts(conflicts):
+def ignore_conflicts(conflicts, verbose=True):
     ignore_count = 0
     if os.path.exists(IGNORE_CONFLICTS_FILE):
         with open(IGNORE_CONFLICTS_FILE) as iow:
-            ignore_list = [dir_name.strip() if not dir_name.startswith('#') else '' for dir_name in iow.readlines()]
+            ignore_list = []
+            for dir_name in iow.readlines():
+                if not dir_name.startswith('#') and len(dir_name) > 1:
+                    ignore_list.append(dir_name.strip())
         for ignore_dir in ignore_list:
             conflicts.discard(ignore_dir)
             ignore_count+=1
+            if verbose:
+                print(f"Ignoring {ignore_dir}")
     else:
         print('No {} file, no ignoring')
     return conflicts, ignore_count
@@ -34,21 +39,24 @@ def find_path(dir_name, paths):
             result.append(bingo)
             print("Found at: ", bingo)
 
-lin=os.listdir(lin_path)
-win=multiple_paths([win_path, win_path2])
+def main():
+    lin=os.listdir(lin_path)
+    win=multiple_paths([win_path, win_path2])
 
-print('These games are installed on both lin and win')
-#https://stackoverflow.com/questions/11615041/how-to-find-match-items-from-two-lists
-conflicts=set(win).intersection(set(lin))
-conflicts, ignore_count = ignore_conflicts(conflicts)
-print("Found {} conflicts ({} ignored)".format(len(conflicts), ignore_count))
-reader_buffer=5
-for id, conflict in enumerate(conflicts):
-    reader_buffer-=1
-    print(conflict)
-    find_path(conflict, [lin_path, win_path, win_path2])
-    if reader_buffer == 0:
-        input('...continue...')
-        reader_buffer=5
+    print('These games are installed on both lin and win')
+    #https://stackoverflow.com/questions/11615041/how-to-find-match-items-from-two-lists
+    conflicts=set(win).intersection(set(lin))
+    conflicts, ignore_count = ignore_conflicts(conflicts)
+    print("Found {} conflicts ({} ignored)".format(len(conflicts), ignore_count))
 
+    reader_buffer=5
+    for id, conflict in enumerate(sorted(conflicts)):
+        reader_buffer-=1
+        print(conflict)
+        find_path(conflict, [lin_path, win_path, win_path2])
+        if reader_buffer == 0:
+            input('...continue...')
+            reader_buffer=5
 
+if __name__ == '__main__':
+    main()
