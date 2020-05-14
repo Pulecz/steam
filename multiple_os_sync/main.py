@@ -17,7 +17,7 @@ def ignore_conflicts(conflicts):
     ignore_count = 0
     if os.path.exists(IGNORE_CONFLICTS_FILE):
         with open(IGNORE_CONFLICTS_FILE) as iow:
-            ignore_list = [dir_name.strip() for dir_name in iow.readlines()]
+            ignore_list = [dir_name.strip() if not dir_name.startswith('#') else '' for dir_name in iow.readlines()]
         for ignore_dir in ignore_list:
             conflicts.discard(ignore_dir)
             ignore_count+=1
