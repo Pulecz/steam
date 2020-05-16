@@ -2,12 +2,26 @@
 # big games
 Arma 3, native on both
 # classics
+Age of Mythology, proton runs slow, but its fine
 Banished, its small, works fine, steam cloud
-Cities Skylines, musthave
+Cities_Skylines, musthave
 Frostpunk, proton makes it slow, but playable
+HiddenFolks, its smoll
+Hitman Codename 47, finish it already
 Kerbal Space Program, unityEmess, better keep it on Windows as well
 RimWorld, its small, works fine, steam cloud
 # VR
-SoundStage, VR
+SoundStage, must have VR (testing)
+Elite Dangerous, on linux for testing, must have VR (testing)
+DiRT Rally 2.0, must have VR
+Project CARS 2, must have VR
 # fun
-
+rocketleague, multiplayer fun
+dayofinfamy, multiplayer fun
+# testing
+swkotor, test mod package
+Knights of the Old Republic II, test mods
+Automation, still in alpha testing
+Fallout New Vegas enplczru, mods
+Fallout 4, mods
+Skyrim, mods
