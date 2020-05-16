@@ -1,16 +1,39 @@
 import os
 from pprint import pprint as pp
 
-win_path='/masterstorage/steamlibrary_win_only/SteamLibrary/steamapps/common/'
-lin_path='/motherstorage/SteamLibrary/steamapps/common/'
-win_path2='/mnt/Program Files (x86)/Steam/steamapps/common/'
+PATHS={
+    'win_path':'/masterstorage/steamlibrary_win_only/SteamLibrary/steamapps/common/',
+    'lin_path':'/motherstorage/SteamLibrary/steamapps/common/',
+    'lin_path2':'~/.local/share/Steam/steamapps/common',
+    'win_path2':'/mnt/Program Files (x86)/Steam/steamapps/common/',
+}
 IGNORE_CONFLICTS_FILE='ignore_conflicts.txt'
 get_sizes = True
+
+def process_paths(paths):
+    "verify that all paths exist, expands ~ too"
+    ok_paths = {}
+
+    for path_name, path in paths.items():
+        if path.startswith('~'):
+            expanded = os.path.expanduser(path)
+            if not os.path.exists(expanded):
+                print(f"ERROR: {expanded} not found, skipping")
+            ok_paths[path_name] = expanded
+            continue
+
+        if not os.path.exists(path):
+            print(f"ERROR: {path_name} not found, skipping")
+        ok_paths[path_name] = path
+    return ok_paths
+
 
 def listdir_multiple_paths(paths):
     "simple append for listdir"
     result = []
     for path in paths:
+        if not len(path) > 1:
+            continue
         for dir_name in os.listdir(path):
             result.append(dir_name)
     return result
@@ -41,12 +64,14 @@ def find_path(dir_name, paths):
     return result
 
 def find_and_print(conflict, ignore_list):
+    "find an item (has to be split by ',') and return True"
     for item in ignore_list:
         if conflict == item[:item.find(',')]:
             print("- Ignoring ", item)
             return True
 
 def get_dir_size(start_path = '.'):
+    "stolen from ..."
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):
         for f in filenames:
@@ -59,8 +84,10 @@ def get_dir_size(start_path = '.'):
 
 def main():
     "scan paths, highglights conflicts, display on buffered way"
-    lin=os.listdir(lin_path)
-    win=listdir_multiple_paths([win_path, win_path2])
+    ok_paths=process_paths(PATHS)
+    all_paths=list(ok_paths.values())
+    lin=listdir_multiple_paths([path if path_name.startswith('lin') else '' for path_name, path in ok_paths.items()])
+    win=listdir_multiple_paths([path if path_name.startswith('win') else '' for path_name, path in ok_paths.items()])
     ignore_list = load_ignore_conflicts_list()
 
     print('These games are installed on both lin and win')
@@ -77,10 +104,10 @@ def main():
         reader_buffer-=1
         print(f"* {conflict}")
         if get_sizes:
-            paths = find_path(conflict, [lin_path, win_path, win_path2])
+            paths = find_path(conflict, all_paths)
             print(f"Size: {round(float(get_dir_size(paths[0]))/1024/1024/1024, 3)} GB")  # get dir for just one of the paths
         else:
-            find_path(conflict, [lin_path, win_path, win_path2])
+            find_path(conflict, all_paths)
         if reader_buffer == 0:
             input('...continue...')
             reader_buffer=5
