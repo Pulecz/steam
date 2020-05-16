@@ -9,38 +9,50 @@ PATHS={
 }
 IGNORE_CONFLICTS_FILE='ignore_conflicts.txt'
 get_sizes = True
+thorough_size_compare = True  #TODO: check sizes of all folders and compare
+
 
 def process_paths(paths):
-    "verify that all paths exist, expands ~ too"
+    """verify that all paths exist, expands ~ too
+    returns ok paths for windows and linux (depends on just path_name)"""
     ok_paths = {}
 
     for path_name, path in paths.items():
+        # ~ path
         if path.startswith('~'):
             expanded = os.path.expanduser(path)
             if not os.path.exists(expanded):
                 print(f"ERROR: {expanded} not found, skipping")
+                continue
             ok_paths[path_name] = expanded
-            continue
+        # regular path
+        else:
+            if not os.path.exists(path):
+                print(f"ERROR: {path_name} not found, skipping")
+                continue
+            ok_paths[path_name] = path
 
-        if not os.path.exists(path):
-            print(f"ERROR: {path_name} not found, skipping")
-        ok_paths[path_name] = path
-    return ok_paths
+    # split by path_name
+    lin_paths = []
+    win_paths = []
+    for path_name, path in ok_paths.items():
+        if path_name.startswith('lin'):
+            lin_paths.append(path)
+        elif path_name.startswith('win'):
+            win_paths.append(path)
+
+    return lin_paths, win_paths
 
 
 def listdir_multiple_paths(paths):
-    "simple append for listdir"
-    result = []
-    for path in paths:
-        if not len(path) > 1:
-            continue
-        for dir_name in os.listdir(path):
-            result.append(dir_name)
-    return result
+    "append each item for result of listdir"
+    return [listed_dir
+            for path in paths
+            for listed_dir in os.listdir(path)]
 
 
 def load_ignore_conflicts_list():
-    "load a file with some filtering"
+    "load a ignore file with some filtering (skip # and empty)"
     ignore_list = []
     if os.path.exists(IGNORE_CONFLICTS_FILE):
         with open(IGNORE_CONFLICTS_FILE) as iow:
@@ -63,12 +75,14 @@ def find_path(dir_name, paths):
             print("\tFound at: ", bingo)
     return result
 
+
 def find_and_print(conflict, ignore_list):
     "find an item (has to be split by ',') and return True"
     for item in ignore_list:
         if conflict == item[:item.find(',')]:
             print("- Ignoring ", item)
             return True
+
 
 def get_dir_size(start_path = '.'):
     "stolen from ..."
@@ -84,10 +98,11 @@ def get_dir_size(start_path = '.'):
 
 def main():
     "scan paths, highglights conflicts, display on buffered way"
-    ok_paths=process_paths(PATHS)
-    all_paths=list(ok_paths.values())
-    lin=listdir_multiple_paths([path if path_name.startswith('lin') else '' for path_name, path in ok_paths.items()])
-    win=listdir_multiple_paths([path if path_name.startswith('win') else '' for path_name, path in ok_paths.items()])
+    lin_paths, win_paths = process_paths(PATHS)
+    all_paths = lin_paths + win_paths
+
+    lin=listdir_multiple_paths(lin_paths)
+    win=listdir_multiple_paths(win_paths)
     ignore_list = load_ignore_conflicts_list()
 
     print('These games are installed on both lin and win')
