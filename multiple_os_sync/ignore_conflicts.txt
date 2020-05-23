@@ -4,6 +4,12 @@ Arma 3, native on both
 # classics
 Age of Mythology, proton runs slow, but its fine
 Banished, its small, works fine, steam cloud
+BomberCrew, its small, works fine, steam cloud
+Crusader Kings II, paradox
+Europa Universalis IV, paradox
+Hearts of Iron IV, paradox
+Stellaris, paradox
+Eve Online, MMO hell
 Cities_Skylines, musthave
 Frostpunk, proton makes it slow, but playable
 HiddenFolks, its smoll
@@ -11,6 +17,11 @@ Hitman Codename 47, finish it already
 Kerbal Space Program, unityEmess, better keep it on Windows as well
 RimWorld, its small, works fine, steam cloud
 # VR
+EarthVR, Google
+SteamVR, Steam
+Steamworks Shared, Steam
+American Truck Simulator, must have VR
+Euro Truck Simulator 2, must have VR
 SoundStage, must have VR (testing)
 Elite Dangerous, on linux for testing, must have VR (testing)
 DiRT Rally 2.0, must have VR
@@ -25,3 +36,4 @@ Automation, still in alpha testing
 Fallout New Vegas enplczru, mods
 Fallout 4, mods
 Skyrim, mods
+Foundation, proton

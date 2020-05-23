@@ -9,7 +9,10 @@ PATHS={
 }
 IGNORE_CONFLICTS_FILE='ignore_conflicts.txt'
 get_sizes = True
-thorough_size_compare = True  #TODO: check sizes of all folders and compare
+if get_sizes:
+    thorough_size_compare = True
+    if thorough_size_compare:
+        total_non_ignored_used = True
 
 
 def process_paths(paths):
@@ -96,6 +99,15 @@ def get_dir_size(start_path = '.'):
 
     return total_size
 
+
+def get_dir_sizes(*paths):
+    result = []
+    for path in paths:
+        result.append(get_dir_size(path))
+    return result
+
+
+
 def main():
     "scan paths, highglights conflicts, display on buffered way"
     lin_paths, win_paths = process_paths(PATHS)
@@ -110,6 +122,8 @@ def main():
     conflicts=set(win).intersection(set(lin))
     print("Found {} conflicts.".format(len(conflicts)))
 
+    if total_non_ignored_used:
+        total_size = 0
     ignore_count = 0
     reader_buffer=5
     for conflict in sorted(conflicts):
@@ -120,7 +134,15 @@ def main():
         print(f"* {conflict}")
         if get_sizes:
             paths = find_path(conflict, all_paths)
-            print(f"Size: {round(float(get_dir_size(paths[0]))/1024/1024/1024, 3)} GB")  # get dir for just one of the paths
+            if thorough_size_compare:
+                print("Sizes:")
+                for size in get_dir_sizes(*paths):
+                    if total_non_ignored_used:
+                        total_size += size
+                    print(f" {round(float(size)/1024/1024/1024, 3)} GB")
+            else:
+                # get dir for just one of the paths
+                print(f"Size: {round(float(get_dir_size(paths[0]))/1024/1024/1024, 3)} GB")
         else:
             find_path(conflict, all_paths)
         if reader_buffer == 0:
@@ -128,6 +150,8 @@ def main():
             reader_buffer=5
 
     print("Found {} conflicts ({} ignored.)".format(len(conflicts), ignore_count))
+    if total_non_ignored_used:
+        print(f"Total space used by having one game installed at two places: {total_size/1024/1024/1024} GB")
 
 if __name__ == '__main__':
     main()
